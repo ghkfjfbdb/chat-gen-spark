@@ -5,6 +5,7 @@ import ChatInput from '@/components/ChatInput';
 import TypingIndicator from '@/components/TypingIndicator';
 import { useChat } from '@/hooks/useChat';
 import { Button } from '@/components/ui/button';
+import { Trophy } from 'lucide-react';
 
 const Index = () => {
   const { messages, isLoading, sendMessage, clearMessages } = useChat();
@@ -28,7 +29,7 @@ const Index = () => {
     <div className="flex flex-col h-screen bg-background">
       {/* Header */}
       <header className="flex items-center justify-between p-4 border-b">
-        <h1 className="text-xl font-bold">IA Generativa Chat</h1>
+        <h1 className="text-xl font-bold">Alfredo IA Chat</h1>
         <Button 
           variant="outline" 
           size="sm"
@@ -76,7 +77,7 @@ const Index = () => {
       
       {/* Credits Footer */}
       <footer className="py-3 px-4 text-center border-t text-sm text-muted-foreground">
-        <p>Desenvolvido com ❤️ por <span className="font-semibold">MESTRE R</span></p>
+        <p>Desenvolvido com <Trophy className="inline-block h-4 w-4 text-yellow-500" /> por <span className="font-semibold">MESTRE R</span></p>
       </footer>
     </div>
   );
