@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { WikipediaService, WikipediaSearchResult } from '@/services/wikipediaService';
+import { DesciclopediaService, DesciclopediaResult } from '@/services/desciclopediaService';
 
 export type MessageRole = 'user' | 'assistant';
 
@@ -29,14 +30,19 @@ export function useChat() {
   const generateContextualResponse = (userMessage: string): string => {
     const message = userMessage.toLowerCase();
     
+    // Modo zoeira/humor
+    if (message.includes('zoeira') || message.includes('humor') || message.includes('engraçado')) {
+      return "Opa! Ativando o modo zoeira! 😄 Agora posso buscar informações na Desciclopédia para dar umas risadas. Pode perguntar sobre qualquer pessoa famosa, país, ou conceito que eu vou tentar ser mais descontraído nas respostas!";
+    }
+    
     // Saudações
     if (message.includes('olá') || message.includes('oi') || message.includes('bom dia') || message.includes('boa tarde') || message.includes('boa noite')) {
-      return "Olá! Sou o Alfredo IA e estou aqui para ajudar você. Posso responder perguntas, buscar informações na Wikipedia e muito mais. Como posso ser útil hoje?";
+      return "Olá! Sou o Alfredo IA e estou aqui para ajudar você. Posso responder perguntas, buscar informações na Wikipedia e muito mais. Se quiser um pouco de humor, é só falar 'modo zoeira'! Como posso ser útil hoje?";
     }
     
     // Perguntas sobre identidade
     if (message.includes('quem é você') || message.includes('o que você é') || message.includes('seu nome')) {
-      return "Eu sou o Alfredo IA, um assistente virtual inteligente criado para ajudar e conversar com você. Posso responder perguntas, buscar informações na Wikipedia, dar sugestões e ter conversas interessantes!";
+      return "Eu sou o Alfredo IA, um assistente virtual inteligente criado para ajudar e conversar com você. Posso responder perguntas, buscar informações na Wikipedia, dar sugestões e ter conversas interessantes! E se você quiser, posso até ativar o modo zoeira para dar umas risadas! 😉";
     }
     
     // Perguntas sobre capacidades
@@ -116,6 +122,20 @@ export function useChat() {
     return response;
   };
 
+  const generateDesciclopediaResponse = (result: DesciclopediaResult, userMessage: string): string => {
+    let response = "Modo zoeira ativado! 😄 Aqui vai uma versão mais descontraída:\n\n";
+    
+    response += `**${result.title}** (versão Desciclopédia)\n${result.extract}`;
+    
+    if (result.url) {
+      response += `\n\n[Veja mais besteiras na Desciclopédia](${result.url})`;
+    }
+
+    response += "\n\n😂 Lembre-se: isso é só humor! Para informações sérias, é melhor consultar a Wikipedia tradicional.";
+    
+    return response;
+  };
+
   const sendMessage = useCallback(async (messageContent: string) => {
     // Add the user message to the chat
     addMessage(messageContent, 'user');
@@ -129,8 +149,29 @@ export function useChat() {
       
       let response: string;
       
+      // Check if user wants humor mode or Desciclopédia
+      if (DesciclopediaService.shouldSearchDesciclopedia(messageContent)) {
+        // Extract search terms from the message
+        const searchTerms = messageContent
+          .replace(/^(o que é|quem é|quando foi|onde fica|como funciona|história de|biografia de|definição de|explicar|me fale sobre|conte sobre|informações sobre)\s*/i, '')
+          .replace(/\?$/, '')
+          .trim();
+        
+        if (searchTerms.length > 2) {
+          console.log('Buscando na Desciclopédia:', searchTerms);
+          const desciclopediaResult = await DesciclopediaService.searchDesciclopedia(searchTerms);
+          
+          if (desciclopediaResult) {
+            response = generateDesciclopediaResponse(desciclopediaResult, messageContent);
+          } else {
+            response = "Poxa, nem na Desciclopédia eu achei essa maluquice! 😅 Que tal tentar algo mais conhecido ou reformular a pergunta?";
+          }
+        } else {
+          response = generateContextualResponse(messageContent);
+        }
+      }
       // Check if we should search Wikipedia
-      if (WikipediaService.shouldSearchWikipedia(messageContent)) {
+      else if (WikipediaService.shouldSearchWikipedia(messageContent)) {
         // Extract search terms from the message
         const searchTerms = messageContent
           .replace(/^(o que é|quem é|quando foi|onde fica|como funciona|história de|biografia de|definição de|explicar|me fale sobre|conte sobre|informações sobre)\s*/i, '')
