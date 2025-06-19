@@ -1,5 +1,5 @@
-
 import { useState, useCallback } from 'react';
+import { WikipediaService, WikipediaSearchResult } from '@/services/wikipediaService';
 
 export type MessageRole = 'user' | 'assistant';
 
@@ -31,17 +31,17 @@ export function useChat() {
     
     // Saudações
     if (message.includes('olá') || message.includes('oi') || message.includes('bom dia') || message.includes('boa tarde') || message.includes('boa noite')) {
-      return "Olá! Sou o Alfredo IA e estou aqui para ajudar você. Como posso ser útil hoje?";
+      return "Olá! Sou o Alfredo IA e estou aqui para ajudar você. Posso responder perguntas, buscar informações na Wikipedia e muito mais. Como posso ser útil hoje?";
     }
     
     // Perguntas sobre identidade
     if (message.includes('quem é você') || message.includes('o que você é') || message.includes('seu nome')) {
-      return "Eu sou o Alfredo IA, um assistente virtual inteligente criado para ajudar e conversar com você. Posso responder perguntas, dar sugestões e ter conversas interessantes!";
+      return "Eu sou o Alfredo IA, um assistente virtual inteligente criado para ajudar e conversar com você. Posso responder perguntas, buscar informações na Wikipedia, dar sugestões e ter conversas interessantes!";
     }
     
     // Perguntas sobre capacidades
     if (message.includes('o que você pode fazer') || message.includes('suas habilidades') || message.includes('capacidades')) {
-      return "Posso ajudar com diversas tarefas: responder perguntas, explicar conceitos, dar sugestões, resolver problemas, ter conversas interessantes e muito mais. O que você gostaria de saber ou discutir?";
+      return "Posso ajudar com diversas tarefas: responder perguntas, buscar informações atualizadas na Wikipedia, explicar conceitos, dar sugestões, resolver problemas, ter conversas interessantes e muito mais. O que você gostaria de saber ou discutir?";
     }
     
     // Perguntas sobre programação
@@ -86,14 +86,34 @@ export function useChat() {
     
     // Resposta padrão contextual
     const responses = [
-      "Interessante pergunta! Embora eu não tenha uma resposta específica para isso, posso tentar ajudar de outra forma. Pode me dar mais detalhes sobre o que você está procurando?",
+      "Interessante pergunta! Embora eu não tenha uma resposta específica para isso, posso tentar buscar informações na Wikipedia. Pode me dar mais detalhes sobre o que você está procurando?",
       "Hmm, essa é uma questão que merece reflexão. Você poderia elaborar um pouco mais sobre o que você tem em mente?",
-      "Entendo o que você está perguntando. Embora eu possa não ter todas as respostas, estou aqui para ajudar no que for possível. Pode me contar mais sobre o contexto?",
-      "Boa pergunta! Para te dar uma resposta mais precisa, seria útil se você pudesse fornecer mais informações sobre o que especificamente você gostaria de saber.",
-      "Vou tentar ajudar da melhor forma possível. Pode me explicar um pouco mais sobre o que você está buscando ou qual é o contexto da sua pergunta?"
+      "Entendo o que você está perguntando. Posso buscar informações na Wikipedia para te ajudar. Pode me contar mais sobre o contexto?",
+      "Boa pergunta! Para te dar uma resposta mais precisa, posso consultar a Wikipedia. Seria útil se você pudesse fornecer mais informações sobre o que especificamente você gostaria de saber.",
+      "Vou tentar ajudar da melhor forma possível. Posso buscar informações atualizadas na Wikipedia sobre esse assunto. Pode me explicar um pouco mais sobre o que você está buscando?"
     ];
     
     return responses[Math.floor(Math.random() * responses.length)];
+  };
+
+  const generateWikipediaResponse = (results: WikipediaSearchResult[], userMessage: string): string => {
+    if (results.length === 0) {
+      return "Desculpe, não encontrei informações relevantes na Wikipedia sobre esse assunto. Posso tentar ajudar de outra forma ou você pode reformular sua pergunta.";
+    }
+
+    let response = "Com base nas informações da Wikipedia:\n\n";
+    
+    results.forEach((result, index) => {
+      if (index > 0) response += "\n---\n\n";
+      response += `**${result.title}**\n${result.extract}`;
+      if (result.url) {
+        response += `\n\n[Leia mais na Wikipedia](${result.url})`;
+      }
+    });
+
+    response += "\n\nEspero ter ajudado! Se tiver mais dúvidas, fique à vontade para perguntar.";
+    
+    return response;
   };
 
   const sendMessage = useCallback(async (messageContent: string) => {
@@ -105,10 +125,29 @@ export function useChat() {
     
     try {
       // Simulate thinking time
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Generate contextual response
-      const response = generateContextualResponse(messageContent);
+      let response: string;
+      
+      // Check if we should search Wikipedia
+      if (WikipediaService.shouldSearchWikipedia(messageContent)) {
+        // Extract search terms from the message
+        const searchTerms = messageContent
+          .replace(/^(o que é|quem é|quando foi|onde fica|como funciona|história de|biografia de|definição de|explicar|me fale sobre|conte sobre|informações sobre)\s*/i, '')
+          .replace(/\?$/, '')
+          .trim();
+        
+        if (searchTerms.length > 2) {
+          console.log('Buscando na Wikipedia:', searchTerms);
+          const wikipediaResults = await WikipediaService.searchWikipedia(searchTerms);
+          response = generateWikipediaResponse(wikipediaResults, messageContent);
+        } else {
+          response = generateContextualResponse(messageContent);
+        }
+      } else {
+        response = generateContextualResponse(messageContent);
+      }
+      
       addMessage(response, 'assistant');
     } catch (error) {
       console.error("Error getting AI response:", error);
