@@ -1,3 +1,4 @@
+
 export class ElaboratedResponseService {
   static generateElaboratedResponse(userMessage: string): string {
     const message = userMessage.toLowerCase();
@@ -16,122 +17,166 @@ export class ElaboratedResponseService {
 
     const mainTerm = isQuestion ? extractMainTerm(message) : message;
 
-    // Bancos de dados - resposta específica baseada na pergunta
+    // === BANCOS DE DADOS ===
+    
+    // MySQL
     if (message.includes('mysql') || mainTerm.includes('mysql')) {
       if (message.includes('como funciona') || message.includes('como usar')) {
-        return "O MySQL funciona como um sistema de gerenciamento de banco de dados relacional que usa SQL para consultas. Ele armazena dados em tabelas organizadas em linhas e colunas, suporta transações ACID e oferece recursos como índices, replicação e clustering. Para usar: instale o servidor, crie um banco, defina tabelas com CREATE TABLE, insira dados com INSERT e consulte com SELECT.";
+        return "MySQL é um SGBD relacional que usa SQL para consultas. Funciona com engine InnoDB por padrão, suporta transações ACID, índices B-tree, replicação master-slave/master-master. Instalação: MySQL Server → criação de database → tabelas com CREATE TABLE → inserção com INSERT → consultas com SELECT. Porta padrão: 3306.";
       } else if (message.includes('vantagens') || message.includes('benefícios')) {
-        return "As principais vantagens do MySQL incluem: alta performance, confiabilidade comprovada, facilidade de uso, ampla compatibilidade, suporte robusto da comunidade, escalabilidade horizontal e vertical, segurança avançada, e custo-benefício excelente por ser open source com opções comerciais disponíveis.";
+        return "Vantagens do MySQL: alta performance em leitura, confiabilidade comprovada em produção, facilidade de configuração, ampla compatibilidade (PHP, Python, Java, Node.js), comunidade ativa, custo zero (GPL), opções comerciais disponíveis, boa documentação, suporte a clustering e particionamento.";
+      } else if (message.includes('desvantagens') || message.includes('problemas')) {
+        return "Desvantagens do MySQL: limitações em consultas complexas comparado ao PostgreSQL, menor conformidade com padrões SQL, funcionalidades avançadas limitadas na versão gratuita, performance inferior em escritas intensivas, suporte limitado a tipos de dados avançados.";
       } else {
-        return "MySQL é um sistema de gerenciamento de banco de dados relacional (RDBMS) open source, desenvolvido pela Oracle. É amplamente utilizado em aplicações web devido à sua confiabilidade, performance e facilidade de uso. Suporta SQL padrão, transações ACID, replicação master-slave, e é compatível com diversas linguagens de programação.";
+        return "MySQL é um sistema de gerenciamento de banco de dados relacional (RDBMS) open source desenvolvido pela Oracle. Usado em 39% dos sites web, incluindo Facebook, Twitter, YouTube. Características: engine InnoDB, transações ACID, replicação, clustering, índices otimizados, compatibilidade multi-plataforma.";
       }
     }
 
+    // PostgreSQL
     if (message.includes('postgresql') || message.includes('postgres') || mainTerm.includes('postgresql')) {
       if (message.includes('diferença') && message.includes('mysql')) {
-        return "PostgreSQL vs MySQL: PostgreSQL é mais robusto para aplicações complexas, oferece melhor suporte a JSON, tipos de dados avançados, consultas complexas e conformidade SQL mais estrita. MySQL é mais simples, rápido para operações básicas e tem maior adoção web. PostgreSQL é ideal para sistemas empresariais; MySQL para aplicações web tradicionais.";
+        return "PostgreSQL vs MySQL: PostgreSQL tem melhor conformidade SQL, suporte superior a JSON/JSONB, tipos de dados avançados (arrays, hstore), extensões (PostGIS), consultas complexas otimizadas, MVCC nativo. MySQL é mais simples, melhor performance em leitura, maior adoção web. PostgreSQL para sistemas complexos; MySQL para aplicações web tradicionais.";
       } else if (message.includes('como funciona')) {
-        return "PostgreSQL funciona como um sistema objeto-relacional avançado. Usa arquitetura multi-processo, suporte MVCC para concorrência, WAL para durabilidade, e oferece recursos como stored procedures, triggers, views materializadas, full-text search, e extensões personalizáveis. Executa consultas através do otimizador de consultas baseado em custos.";
+        return "PostgreSQL usa arquitetura multi-processo com shared memory. Principais componentes: Postmaster (processo principal), Backend processes (conexões), Background processes (checkpointer, WAL writer). MVCC para concorrência, WAL para durabilidade, otimizador baseado em custos, suporte a índices: B-tree, Hash, GiST, GIN.";
+      } else if (message.includes('vantagens')) {
+        return "Vantagens do PostgreSQL: conformidade SQL rigorosa, extensibilidade (PostGIS, pg_stat_statements), tipos de dados ricos (JSON, Arrays, UUID), performance superior em consultas complexas, ACID completo, replicação streaming, suporte a procedimentos em múltiplas linguagens (PL/pgSQL, Python, Perl).";
       } else {
-        return "PostgreSQL é um sistema de banco de dados objeto-relacional open source, conhecido por sua robustez e conformidade com padrões SQL. Oferece recursos avançados como tipos de dados customizados, indexação sofisticada, suporte completo a transações ACID, replicação streaming e extensibilidade através de procedimentos armazenados em múltiplas linguagens.";
+        return "PostgreSQL é um sistema de banco de dados objeto-relacional open source, conhecido pela robustez e conformidade SQL. Usado por Instagram, Spotify, Reddit. Características: MVCC, extensões personalizáveis, JSON nativo, full-text search, replicação lógica, suporte a parallel queries.";
       }
     }
 
-    // Outras respostas de banco de dados
+    // MongoDB
     if (message.includes('mongodb') || mainTerm.includes('mongodb')) {
       if (message.includes('como funciona')) {
-        return "MongoDB funciona como um banco de dados NoSQL orientado a documentos. Armazena dados em formato JSON-like (BSON), sem esquema fixo. Suporta indexação, agregação, replicação e sharding. É ideal para aplicações que precisam de flexibilidade e escalabilidade horizontal.";
+        return "MongoDB armazena dados em documentos BSON (Binary JSON) em collections. Arquitetura: mongod (servidor), mongo shell (cliente), drivers de linguagem. Sharding automático, replica sets para alta disponibilidade, índices: single field, compound, multikey, text, geospatial. Consultas via find(), aggregate pipeline.";
       } else if (message.includes('vantagens')) {
-        return "As vantagens do MongoDB incluem: flexibilidade do esquema, alta escalabilidade, facilidade de uso, suporte a grandes volumes de dados, replicação integrada e bom desempenho em leitura e escrita. É adequado para aplicações web, mobile e IoT.";
+        return "Vantagens do MongoDB: esquema flexível (schemaless), escalabilidade horizontal nativa, performance superior para leitura/escrita de documentos, consultas ricas com aggregation framework, índices geoespaciais, GridFS para arquivos grandes, integração natural com JavaScript/JSON.";
+      } else if (message.includes('desvantagens')) {
+        return "Desvantagens do MongoDB: consumo elevado de memória, ausência de transações ACID multi-documento (até v4.0), joins limitados ($lookup), consistência eventual por padrão, curva de aprendizado para modelagem NoSQL, tamanho maior dos documentos BSON.";
       } else {
-        return "MongoDB é um banco de dados NoSQL orientado a documentos, projetado para alta escalabilidade e flexibilidade. É popular em aplicações modernas que precisam lidar com grandes volumes de dados não estruturados. Oferece recursos como indexação, agregação e replicação.";
+        return "MongoDB é um banco NoSQL orientado a documentos, armazenando dados em formato BSON. Usado por Facebook, eBay, Cisco. Características: sharding automático, replica sets, aggregation pipeline, índices ricos, consultas ad-hoc, API consistente entre linguagens.";
       }
     }
 
+    // Redis
     if (message.includes('redis') || mainTerm.includes('redis')) {
       if (message.includes('como funciona')) {
-        return "Redis funciona como um banco de dados em memória que armazena dados em estruturas como strings, hashes, listas, sets e sorted sets. É usado como cache, message broker e gerenciador de sessões. Oferece alta performance e baixa latência.";
+        return "Redis é um banco in-memory key-value com estruturas de dados: strings, hashes, lists, sets, sorted sets, bitmaps, HyperLogLogs. Single-threaded com event loop, persistência via RDB snapshots ou AOF (Append Only File). Suporta pub/sub, Lua scripting, clustering.";
       } else if (message.includes('vantagens')) {
-        return "As vantagens do Redis incluem: alta performance, baixa latência, suporte a diversas estruturas de dados, facilidade de uso, persistência opcional e suporte a pub/sub. É ideal para caching, filas de mensagens e contadores em tempo real.";
+        return "Vantagens do Redis: latência ultra-baixa (<1ms), alta throughput (100K+ ops/sec), estruturas de dados ricas, persistência configurável, replicação master-slave, clustering automático, pub/sub nativo, transações com MULTI/EXEC, expire automático de chaves.";
+      } else if (message.includes('casos de uso')) {
+        return "Casos de uso do Redis: cache de sessões web, cache de consultas de banco, filas de mensagens, leaderboards em tempo real, contadores/métricas, rate limiting, cache de objetos, sessões distribuídas, pub/sub para notificações.";
       } else {
-        return "Redis é um banco de dados em memória de código aberto, usado como cache, message broker e gerenciador de sessões. É conhecido por sua alta performance e baixa latência. Suporta diversas estruturas de dados e oferece persistência opcional.";
+        return "Redis é um banco de dados in-memory key-value, usado como cache, message broker e armazenamento de sessão. Usado por Twitter, GitHub, Instagram. Características: latência sub-milissegundo, estruturas de dados avançadas, persistência opcional, clustering, pub/sub.";
       }
     }
 
-    // Programação - respostas contextuais
+    // Elasticsearch
+    if (message.includes('elasticsearch') || message.includes('elastic search') || mainTerm.includes('elasticsearch')) {
+      if (message.includes('como funciona')) {
+        return "Elasticsearch usa Apache Lucene para indexação full-text. Arquitetura distribuída: nodes, clusters, indices, shards, replicas. Documentos JSON armazenados em índices invertidos. API REST para todas as operações. Query DSL para buscas complexas, aggregations para analytics.";
+      } else if (message.includes('vantagens')) {
+        return "Vantagens do Elasticsearch: busca full-text extremamente rápida, análise de dados em tempo real, escalabilidade horizontal automática, API REST simples, agregações poderosas, tolerância a falhas, integração com Kibana para visualização, suporte a geolocalização.";
+      } else if (message.includes('casos de uso')) {
+        return "Casos de uso do Elasticsearch: busca em e-commerce, análise de logs (ELK stack), monitoramento de aplicações, business intelligence, busca em documentos, análise de métricas, detecção de anomalias, search-as-you-type.";
+      } else {
+        return "Elasticsearch é um mecanismo de busca e análise distribuído baseado em Lucene. Usado por Wikipedia, GitHub, Netflix. Características: busca full-text, análise em tempo real, API REST, agregações, geo-queries, machine learning integrado.";
+      }
+    }
+
+    // Apache Cassandra
+    if (message.includes('cassandra') || message.includes('apache cassandra') || mainTerm.includes('cassandra')) {
+      if (message.includes('como funciona')) {
+        return "Cassandra usa arquitetura masterless peer-to-peer com consistent hashing. Dados distribuídos em nodes via partition key. Replicação configurável por datacenter. Consistency levels ajustáveis (ONE, QUORUM, ALL). CQL (Cassandra Query Language) similar ao SQL.";
+      } else if (message.includes('vantagens')) {
+        return "Vantagens do Cassandra: alta disponibilidade (99.999%), escalabilidade linear, performance constante com crescimento, tolerância a falhas de datacenter, escritas otimizadas, replicação multi-datacenter, sem single point of failure.";
+      } else if (message.includes('casos de uso')) {
+        return "Casos de uso do Cassandra: IoT e séries temporais, sistemas de recomendação, logs de aplicações em larga escala, dados de sensores, mensageria, catálogos de produtos, analytics em tempo real, sistemas que precisam de 99.999% uptime.";
+      } else {
+        return "Apache Cassandra é um banco NoSQL distribuído projetado para alta disponibilidade sem single point of failure. Usado por Netflix, Facebook, Twitter. Características: arquitetura masterless, consistent hashing, replicação multi-datacenter, CQL.";
+      }
+    }
+
+    // CouchDB
+    if (message.includes('couchdb') || message.includes('couch') || message.includes('base de sofá')) {
+      if (message.includes('como funciona')) {
+        return "CouchDB armazena documentos JSON com _id e _rev únicos. Usa MVCC para concorrência. API RESTful completa (GET, POST, PUT, DELETE). Map/Reduce para views. Replicação bi-direcional eventual. Conflict resolution automático.";
+      } else if (message.includes('vantagens')) {
+        return "Vantagens do CouchDB: replicação offline-first, API REST simples, ACID ao nível do documento, conflict resolution automático, schema-free, views incrementais com Map/Reduce, replicação master-master, tolerância a partições de rede.";
+      } else {
+        return "CouchDB é um banco NoSQL orientado a documentos com foco em replicação e disponibilidade offline. Criado pela Apache Foundation. Características: documentos JSON, API REST, replicação bi-direcional, MVCC, views Map/Reduce.";
+      }
+    }
+
+    // DynamoDB
+    if (message.includes('dynamodb') || message.includes('dynamo') || mainTerm.includes('dynamodb')) {
+      if (message.includes('como funciona')) {
+        return "DynamoDB usa hash/range keys para distribuição. Partition key determina a partição; sort key ordena itens. Consistency: eventually consistent (padrão) ou strongly consistent. Auto-scaling baseado em RCU/WCU. Global tables para multi-região.";
+      } else if (message.includes('vantagens')) {
+        return "Vantagens do DynamoDB: performance previsível (<10ms), auto-scaling automático, backup automático, integração nativa AWS, zero administração, global tables, streams para triggers, encryption at rest, pay-per-use pricing.";
+      } else if (message.includes('limitações')) {
+        return "Limitações do DynamoDB: queries limitadas (apenas por keys), item máximo 400KB, sem joins nativos, vendor lock-in AWS, custos podem ser altos para workloads específicos, limited querying capabilities comparado a SQL.";
+      } else {
+        return "DynamoDB é um banco NoSQL totalmente gerenciado pela AWS, focado em performance e escala. Usado por Lyft, Samsung, Toyota. Características: latência de milissegundos, auto-scaling, backup automático, global tables, zero administration.";
+      }
+    }
+
+    // Microsoft SQL Server
+    if (message.includes('sql server') || message.includes('microsoft sql') || mainTerm.includes('sql server')) {
+      if (message.includes('como funciona')) {
+        return "SQL Server usa arquitetura multi-threaded com buffer pool para cache. Componentes: Database Engine, Analysis Services, Reporting Services, Integration Services. T-SQL como linguagem. Always On para alta disponibilidade. Columnstore indexes para analytics.";
+      } else if (message.includes('vantagens')) {
+        return "Vantagens do SQL Server: integração profunda com ecosistema Microsoft, ferramentas avançadas (SSMS, SSIS, SSRS), performance enterprise, Always On availability groups, in-memory OLTP, advanced analytics com R/Python, security robusta.";
+      } else if (message.includes('edições') || message.includes('versões')) {
+        return "Edições do SQL Server: Express (gratuita, 10GB), Standard (funcionalidades completas), Enterprise (recursos avançados), Developer (gratuita para dev/test). SQL Server on Linux disponível. Azure SQL como cloud option.";
+      } else {
+        return "Microsoft SQL Server é um RDBMS enterprise da Microsoft. Usado por Stack Overflow, Xerox, Honeywell. Características: T-SQL, Always On, columnstore indexes, in-memory OLTP, integration services, reporting services, analysis services.";
+      }
+    }
+
+    // === PROGRAMAÇÃO ===
+    
     if (message.includes('javascript') || message.includes('js')) {
       if (message.includes('como aprender') || message.includes('estudar')) {
-        return "Para aprender JavaScript: 1) Comece com fundamentos (variáveis, funções, loops), 2) Pratique no navegador com console.log, 3) Aprenda DOM manipulation, 4) Estude ES6+ features, 5) Pratique com projetos pequenos, 6) Explore Node.js para backend, 7) Use recursos como MDN, freeCodeCamp e JavaScript.info. A prática constante é fundamental!";
+        return "Roteiro para aprender JavaScript: 1) Sintaxe básica (variáveis, tipos, operadores), 2) Estruturas de controle (if, loops, switch), 3) Funções e escopo, 4) Arrays e objetos, 5) DOM manipulation, 6) Promises e async/await, 7) ES6+ features, 8) Node.js basics, 9) Framework (React/Vue), 10) Projetos práticos.";
       } else if (message.includes('frameworks') || message.includes('bibliotecas')) {
-        return "Principais frameworks/bibliotecas JavaScript: React (interfaces de usuário), Vue.js (progressivo e intuitivo), Angular (aplicações enterprise), Node.js (backend), Express.js (servidor web), Next.js (React full-stack), Svelte (compilação otimizada), jQuery (manipulação DOM legacy). Escolha baseado no projeto e experiência da equipe.";
+        return "Principais frameworks JavaScript: React (Facebook, component-based UI), Vue.js (progressive framework), Angular (Google, full framework), Node.js (server-side), Express.js (web server), Next.js (React full-stack), Nuxt.js (Vue full-stack), Svelte (compile-time optimization).";
+      } else if (message.includes('es6') || message.includes('es2015')) {
+        return "ES6/ES2015 principais features: arrow functions (=>), template literals (`${}`), destructuring assignment, let/const, classes, modules (import/export), promises, spread operator (...), default parameters, for...of loops, Map/Set collections.";
       } else {
-        return "JavaScript é uma linguagem de programação dinâmica, interpretada e multi-paradigma. Originalmente criada para web browsers, hoje roda em servidores (Node.js), mobile e desktop. Características: tipagem dinâmica, funções como objetos de primeira classe, closures, prototypes, event-driven, e ecossistema NPM extenso.";
+        return "JavaScript é uma linguagem de programação dinâmica, interpretada, multi-paradigma. Criada em 1995 por Brendan Eich. Características: tipagem dinâmica, first-class functions, closures, prototype-based OOP, event-driven, single-threaded com event loop.";
       }
     }
 
-    // Inteligência Artificial - respostas específicas
+    // === INTELIGÊNCIA ARTIFICIAL ===
+    
     if (message.includes('inteligência artificial') || message.includes('ia') || message.includes('machine learning')) {
       if (message.includes('como funciona') || message.includes('funcionamento')) {
-        return "A IA funciona através de algoritmos que processam dados para identificar padrões e fazer previsões. Machine Learning usa dados históricos para treinar modelos matemáticos. Deep Learning emprega redes neurais artificiais com múltiplas camadas. O processo envolve: coleta de dados → pré-processamento → treinamento → validação → implementação → monitoramento contínuo.";
+        return "IA funciona através de algoritmos que aprendem padrões em dados. Processo: 1) Coleta de dados, 2) Pré-processamento, 3) Escolha do algoritmo, 4) Treinamento do modelo, 5) Validação, 6) Deploy, 7) Monitoramento. Machine Learning usa estatística e otimização; Deep Learning usa redes neurais multicamadas.";
       } else if (message.includes('tipos') || message.includes('categorias')) {
-        return "Tipos de IA: 1) IA Estreita (específica, como Siri), 2) IA Geral (hipotética, similar à humana), 3) Superinteligência (teórica, superior à humana). Por abordagem: Machine Learning, Deep Learning, NLP, Computer Vision, Robotics. Por aplicação: IA Conversacional, Preditiva, Generativa, e de Recomendação.";
+        return "Tipos de IA: 1) Narrow AI (específica, atual), 2) General AI (AGI, hipotética), 3) Superintelligence (teórica). Por aprendizado: Supervised Learning, Unsupervised Learning, Reinforcement Learning. Aplicações: NLP, Computer Vision, Robotics, Expert Systems.";
+      } else if (message.includes('algoritmos')) {
+        return "Principais algoritmos de ML: Linear Regression, Logistic Regression, Decision Trees, Random Forest, SVM, K-Means, Neural Networks, Deep Learning (CNN, RNN, LSTM, Transformers), Gradient Boosting, Naive Bayes, K-NN.";
       } else {
-        return "Inteligência Artificial é a capacidade de máquinas realizarem tarefas que normalmente requerem inteligência humana. Inclui aprendizado, raciocínio, percepção e tomada de decisões. Aplicações: assistentes virtuais, carros autônomos, diagnósticos médicos, recomendações personalizadas, tradução automática e análise preditiva. Revoluciona diversos setores através da automação inteligente.";
+        return "Inteligência Artificial é a simulação de inteligência humana em máquinas. Subcampos: Machine Learning, Deep Learning, NLP, Computer Vision, Robotics. Aplicações: assistentes virtuais, carros autônomos, diagnóstico médico, recomendações, tradução automática.";
       }
     }
 
-    // Ciência - respostas contextuais
-    if (message.includes('física quântica') || message.includes('quantum')) {
-      if (message.includes('como funciona') || message.includes('princípios')) {
-        return "A física quântica funciona com princípios fundamentais: 1) Dualidade onda-partícula (partículas se comportam como ondas), 2) Superposição (partículas em múltiplos estados simultaneamente), 3) Emaranhamento (partículas conectadas instantaneamente), 4) Princípio da Incerteza (impossível medir posição e velocidade precisamente). Estas propriedades só se manifestam em escalas atômicas e subatômicas.";
-      } else if (message.includes('aplicações') || message.includes('uso')) {
-        return "Aplicações da física quântica: computação quântica (processamento exponencialmente mais rápido), criptografia quântica (comunicação ultra-segura), sensores quânticos (medições extremamente precisas), medicina (ressonância magnética, radioterapia), eletrônicos (transistores, lasers), GPS (correção relativística) e energia (células solares, LEDs). Está revolucionando a tecnologia moderna.";
-      } else {
-        return "Física quântica é o ramo que estuda o comportamento da matéria e energia em escalas atômicas e subatômicas. Revela que partículas podem existir em superposição de estados, se emaranhar instantaneamente e apresentar probabilidades em vez de certezas. Fundamental para compreender a natureza da realidade e base de tecnologias revolucionárias como computadores quânticos.";
-      }
+    // === RESPOSTAS CONVERSACIONAIS ===
+    
+    if (message.includes('obrigado') || message.includes('obrigada') || message.includes('valeu')) {
+      return "Por nada! Estou aqui para fornecer informações precisas e úteis. Se tiver mais dúvidas técnicas ou quiser aprofundar algum tópico, fique à vontade!";
+    }
+    
+    if (message.includes('tchau') || message.includes('até logo') || message.includes('adeus')) {
+      return "Até logo! Foi um prazer ajudar com informações técnicas. Volte sempre que precisar de esclarecimentos precisos sobre tecnologia, bancos de dados ou programação!";
     }
 
-    // Filosofia - respostas específicas
-    if (message.includes('sentido da vida') || message.includes('propósito')) {
-      if (message.includes('filosofia') || message.includes('filósofos')) {
-        return "Filósofos sobre o sentido da vida: Aristóteles propôs a 'eudaimonia' (florescimento humano), Sartre defendeu que 'existência precede essência' (criamos nosso próprio sentido), Camus explorou o absurdo da existência, Nietzsche falou sobre criar valores próprios, Viktor Frankl enfatizou encontrar significado mesmo no sofrimento. Cada tradição oferece perspectivas únicas sobre esta questão fundamental.";
-      } else if (message.includes('como encontrar')) {
-        return "Para encontrar sentido na vida: 1) Reflita sobre seus valores fundamentais, 2) Identifique atividades que geram satisfação genuína, 3) Cultive relacionamentos significativos, 4) Contribua para algo maior que você mesmo, 5) Pratique gratidão e mindfulness, 6) Aceite que o sentido pode evoluir, 7) Busque experiências autênticas. O sentido é frequentemente construído, não descoberto.";
-      } else {
-        return "O sentido da vida é uma questão fundamental que cada pessoa deve explorar individualmente. Pode incluir: relacionamentos profundos, contribuição para a sociedade, crescimento pessoal, criação de arte ou conhecimento, experiências transcendentais, ou simplesmente viver plenamente cada momento. Não há uma resposta universal, mas a busca em si pode ser profundamente significativa.";
-      }
-    }
-
-    // Resposta contextual genérica baseada no tipo de pergunta
+    // Resposta para perguntas não cobertas
     if (isQuestion) {
-      const responses = [
-        `Sobre "${mainTerm}", essa é uma questão interessante que merece uma análise cuidadosa. Posso buscar informações mais específicas na Wikipedia para você, ou se preferir, posso tentar uma explicação mais detalhada. Poderia me dar mais contexto sobre o que especificamente você gostaria de saber?`,
-        `"${mainTerm}" é um tópico que pode ser abordado de várias perspectivas. Para te dar uma resposta mais precisa e útil, seria interessante saber: você está buscando uma definição geral, aplicações práticas, ou tem algum aspecto específico em mente?`,
-        `Entendo que você quer saber sobre "${mainTerm}". Este é um assunto que posso explicar de forma mais detalhada. Você gostaria de uma visão geral primeiro, ou tem alguma dúvida específica que posso esclarecer?`
-      ];
-      
-      return responses[Math.floor(Math.random() * responses.length)];
+      return `Não tenho informações específicas sobre "${mainTerm}" em minha base de conhecimento atual. Posso ajudar com tópicos como bancos de dados (MySQL, PostgreSQL, MongoDB, Redis, etc.), programação JavaScript, ou inteligência artificial. Pode reformular sua pergunta ou escolher um desses temas?`;
     }
 
-    // Respostas genéricas e de fallback
-    if (message.includes('ajuda') || message.includes('socorro') || message.includes('não sei')) {
-      return "Claro, estou aqui para ajudar! Pode me explicar melhor qual é sua dúvida ou problema? Vou fazer o meu melhor para encontrar uma solução.";
-    }
-    
-    if (message.includes('obrigado') || message.includes('obrigada') || message.includes('valeu') || message.includes('muito obrigado')) {
-      return "De nada! Fico feliz em poder ajudar. Se tiver mais alguma dúvida ou quiser conversar sobre outro assunto, estarei aqui!";
-    }
-    
-    if (message.includes('tchau') || message.includes('até logo') || message.includes('adeus') || message.includes('bye')) {
-      return "Até logo! Foi um prazer conversar com você. Volte sempre que precisar de ajuda ou quiser bater um papo!";
-    }
-
-    const responses = [
-      "Interessante! Este é um assunto que permite diferentes abordagens. Posso elaborar mais sobre aspectos específicos se você quiser - que direção seria mais útil para você?",
-      "Essa é uma questão que merece reflexão. Há várias facetas a considerar. Você gostaria que eu explore algum aspecto particular?",
-      "Entendo o que você está perguntando. Para dar uma resposta mais direcionada, seria útil saber: você busca informações teóricas, aplicações práticas, ou tem algum contexto específico em mente?"
-    ];
-    
-    return responses[Math.floor(Math.random() * responses.length)];
+    return "Sou especializado em fornecer informações técnicas precisas sobre bancos de dados, programação e tecnologia. Em que posso ajudá-lo especificamente?";
   }
 }
